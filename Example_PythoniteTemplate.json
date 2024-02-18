@@ -1,0 +1,53 @@
+[
+    {
+        "__pythonite_signature__": "ArithmeticOperator",
+        "operator": "+",
+        "operands": [
+            {
+                "__pythonite_signature__": "StaticValue",
+                "value": 1,
+                "type": {
+                    "__pythonite_signature__": "IntegerType"
+                }
+            },
+            {
+                "__pythonite_signature__": "FunctionSource",
+                "function_id": "get_current_user_id",
+                "args": {}
+            }
+        ]
+    },
+    {
+        "__pythonite_signature__": "ForLoop",
+        "loop_variable_name": "user",
+        "iterable": {
+            "__pythonite_signature__": "FunctionSource",
+            "function_id": "get_all_users",
+            "args": {}
+        },
+        "body": [
+            {
+                "__pythonite_signature__": "RenderComponent",
+                "component_id": "user_card",
+                "args": {
+                    "user_id": {
+                        "__pythonite_signature__": "IndexAccessOperator",
+                        "index": "id",
+                        "operands": {
+                            "__pythonite_signature__": "VariableRetrieval",
+                            "name": "user"
+                        }
+                    },
+                    "user_name": {
+                        "__pythonite_signature__": "IndexAccessOperator",
+                        "index": "name",
+                        "operands": {
+                            "__pythonite_signature__": "VariableRetrieval",
+                            "name": "user"
+                        }
+                    }
+                }
+            }
+        ]
+    }
+]
