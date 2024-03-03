@@ -27,7 +27,7 @@ class Scope:
         self.parent = parent
         self.variables = {}
 
-    def declare_variable(self, variable: VariableDeclaration) -> None:
+    def declare_variable(self, variable: "VariableDeclaration") -> None:
         """
         Declares a new variable in the current scope.
 
