@@ -1,4 +1,4 @@
-from typing import Self, Any, TYPE_CHECKING
+from typing import Self, Any, TYPE_CHECKING, Literal
 
 from .errors import (
     VariableAlreadyDeclaredError,
@@ -8,7 +8,7 @@ from .errors import (
 )
 
 if TYPE_CHECKING:
-    from .variable.declare import VariableDeclaration
+    from .types.base import TypeRepresentation
 
 
 class Scope:
@@ -27,7 +27,12 @@ class Scope:
         self.parent = parent
         self.variables = {}
 
-    def declare_variable(self, variable: "VariableDeclaration") -> None:
+    def declare_variable(
+        self,
+        variable_name: str,
+        type: "TypeRepresentation",
+        scope: Literal["global", "local"] = "local",
+    ) -> None:
         """
         Declares a new variable in the current scope.
 
@@ -41,13 +46,15 @@ class Scope:
         VariableAlreadyDeclaredError
             If the variable is already declared in the current scope.
         """
-        if variable.scope == "global" and self.parent is not None:
-            return self.parent.declare_variable(variable=variable)
-        if variable.variable_name in self.variables:
-            raise VariableAlreadyDeclaredError(
-                f"The variable '{variable.variable_name}' is already declared."
+        if scope == "global" and self.parent is not None:
+            return self.parent.declare_variable(
+                variable_name=variable_name, type=type, scope=scope
             )
-        self.variables[variable.variable_name] = {"type": variable.type}
+        if variable_name in self.variables:
+            raise VariableAlreadyDeclaredError(
+                f"The variable '{variable_name}' has already been declared."
+            )
+        self.variables[variable_name] = {"type": type}
 
     def get_variable_value(self, variable_name: str) -> Any:
         """
