@@ -22,7 +22,7 @@ class Annotation(PythoniteRepresentation):
     default: Optional[Any] = None
     required: bool = False
 
-    def validate_annotation(self, value: Any, *args, **kwargs) -> Any:
+    def validate_annotation(self, value: Any = None, *args, **kwargs) -> Any:
         """
         Validate the annotation value.
 
@@ -35,13 +35,22 @@ class Annotation(PythoniteRepresentation):
         Raises:
             ConversionError: If the value cannot be converted to the type of the annotation.
         """
-        raise NotImplementedError()
+        if value is None:
+            if self.required:
+                raise ConversionError(
+                    f"Annotation {self.type} is required and cannot be None."
+                )
+            if self.default is not None:
+                return self.type.convert_value(self.default)
+            return None
 
-    def execute(self, scope: Scope, *args, **kwargs) -> Any:
+        return self.type.convert_value(value)
+
+    def execute(self, scope: Scope, value: Any = None, *args, **kwargs) -> Any:
         """
         Execute the annotation represented by this class.
 
         Returns:
             Any: The value of the annotation represented by this class.
         """
-        return self.validate_annotation(self.default, *args, **kwargs)
+        return self.validate_annotation(value=value, *args, **kwargs)
