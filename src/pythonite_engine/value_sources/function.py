@@ -1,8 +1,11 @@
-from typing import ClassVar, Any
+from typing import ClassVar, Any, TYPE_CHECKING
 
 from ..scope import Scope
 
 from .base import ValueSource
+
+if TYPE_CHECKING:
+    from ..pythonite_engine import PythoniteEngine
 
 
 class FunctionSource(ValueSource):
@@ -25,7 +28,7 @@ class FunctionSource(ValueSource):
     function_id: str
     args: dict[str, Any] = {}
 
-    def execute(self, scope: Scope, *args, **kwargs) -> Any:
+    def execute(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> Any:
         """
         Execute the function value represented by this class.
 
@@ -38,4 +41,4 @@ class FunctionSource(ValueSource):
         >>> function_source.execute()
         10
         """
-        raise NotImplementedError()
+        return engine.get_function(function_id=self.function_id)(**self.args)

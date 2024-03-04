@@ -39,4 +39,4 @@ class StaticValue(ValueSource):
         >>> static_value.execute()
         5
         """
-        return self.value
+        return self.type.convert_value(value=self.value)
