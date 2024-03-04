@@ -1,8 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-from pydantic.json_schema import DEFAULT_REF_TEMPLATE
-from typing import Any, ClassVar, Literal
-from json import dumps
-from pydantic.json_schema import GenerateJsonSchema
+from typing import Any, ClassVar
 
 from .scope import Scope
 
