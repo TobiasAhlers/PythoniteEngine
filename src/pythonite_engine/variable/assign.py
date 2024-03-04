@@ -18,7 +18,6 @@ class VariableAssignment(VariableRepresentation):
     __pythonite_signature__: ClassVar[str] = "VariableAssignment"
 
     value: Any
-    scope: Literal["global", "local"]
 
     def execute(self, scope: Scope, *args, **kwargs) -> None:
         """

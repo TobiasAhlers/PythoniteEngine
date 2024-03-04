@@ -40,4 +40,6 @@ class VariableDeclaration(VariableRepresentation):
         >>> variable = VariableDeclaration(variable_name, type, scope)
         >>> variable.execute()
         """
-        scope.declare_variable(self)
+        scope.declare_variable(
+            variable_name=self.variable_name, type=self.type, scope=self.scope
+        )
