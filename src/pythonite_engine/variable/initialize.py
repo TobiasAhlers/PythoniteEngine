@@ -1,4 +1,4 @@
-from typing import Literal, Any
+from typing import Literal, Any, ClassVar
 
 from ..types.base import TypeRepresentation
 from ..scope import Scope
@@ -16,6 +16,8 @@ class VariableInitialization(VariableRepresentation):
         value (Any): The value to initialize the variable with.
         scope (Literal["global", "local"]): The scope of the variable declared.
     """
+
+    __pythonite_signature__: ClassVar[str] = "VariableInitialization"
 
     type: TypeRepresentation
     value: Any
@@ -37,5 +39,7 @@ class VariableInitialization(VariableRepresentation):
         >>> variable = VariableInitialization(variable_name, type, value, scope)
         >>> variable.execute()
         """
-        scope.declare_variable(self)
-        scope.set_variable_value(self.variable_name, self.value)
+        scope.declare_variable(
+            variable_name=self.variable_name, type=self.type, scope=self.scope
+        )
+        scope.set_variable_value(variable_name=self.variable_name, value=self.value)
