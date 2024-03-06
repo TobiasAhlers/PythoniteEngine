@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pythonite_engine"
+version = "0.1.0"
+authors = [
+  { name="Tobias Ahlers", email="93325697+TobiasAhlers@users.noreply.github.com" },
+]
+description = "A simple template engine for python"
+readme = "README.md"
+requires-python = ">=3.11"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pydantic",
+    "jinja2"
+]
