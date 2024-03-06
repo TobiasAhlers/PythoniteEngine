@@ -22,7 +22,7 @@ class ForLoop(ControlStructureRepresentation):
 
     loop_variable_name: str | PythoniteRepresentation
     iterable: PythoniteRepresentation | Iterable
-    loop_varible_annotation: Annotation
+    loop_variable_annotation: Annotation
     body: list[PythoniteRepresentation]
 
     def execute(self, scope: Scope, *args, **kwargs) -> Any:
@@ -41,7 +41,7 @@ class ForLoop(ControlStructureRepresentation):
         print(self.iterable)
 
         loop_scope = Scope(parent=scope)
-        loop_scope.declare_variable(variable_name=self.loop_variable_name, type=self.loop_varible_annotation.type)
+        loop_scope.declare_variable(variable_name=self.loop_variable_name, type=self.loop_variable_annotation.type)
 
         result = ""
         for item in self.iterable:

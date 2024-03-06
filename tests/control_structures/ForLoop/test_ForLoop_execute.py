@@ -8,7 +8,7 @@ def test_execute_all_direct_values():
         ForLoop(
             loop_variable_name="i",
             iterable=[1, 2, 3],
-            loop_varible_annotation=Annotation(type=IntegerTypeRepresentation()),
+            loop_variable_annotation=Annotation(type=IntegerTypeRepresentation()),
             body=[StaticValue(value="Hello, World!", type=StringTypeRepresentation())],
         ).execute(Scope())
         == "Hello, World!Hello, World!Hello, World!"
@@ -25,7 +25,7 @@ def test_execute_pythonite_representation_as_loop_variable_name():
         ForLoop(
             loop_variable_name=VariableRetrieval(variable_name="x"),
             iterable=[1, 2, 3],
-            loop_varible_annotation=Annotation(type=IntegerTypeRepresentation()),
+            loop_variable_annotation=Annotation(type=IntegerTypeRepresentation()),
             body=[StaticValue(value="Hello, World!", type=StringTypeRepresentation())],
         ).execute(scope=scope, engine=engine)
         == "Hello, World!Hello, World!Hello, World!"
@@ -40,12 +40,11 @@ def test_execute_pythonite_representation_as_iterable():
         type=ListTypeRepresentation(allowed_types=[IntegerTypeRepresentation()]),
     )
     scope.set_variable_value(variable_name="x", value=[1, 2, 3])
-    print(scope.variables)
     assert (
         ForLoop(
             loop_variable_name="i",
             iterable=VariableRetrieval(variable_name="x"),
-            loop_varible_annotation=Annotation(type=IntegerTypeRepresentation()),
+            loop_variable_annotation=Annotation(type=IntegerTypeRepresentation()),
             body=[StaticValue(value="Hello, World!", type=StringTypeRepresentation())],
         ).execute(scope=scope, engine=engine)
         == "Hello, World!Hello, World!Hello, World!"
@@ -62,7 +61,7 @@ def test_execute_pythonite_representation_as_body():
         ForLoop(
             loop_variable_name="i",
             iterable=[1, 2, 3],
-            loop_varible_annotation=Annotation(type=IntegerTypeRepresentation()),
+            loop_variable_annotation=Annotation(type=IntegerTypeRepresentation()),
             body=[VariableRetrieval(variable_name="x")],
         ).execute(scope=scope, engine=engine)
         == "0" * 3
