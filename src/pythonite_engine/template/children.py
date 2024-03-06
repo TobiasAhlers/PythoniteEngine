@@ -17,9 +17,9 @@ class TemplateChildren(PythoniteRepresentation):
 
     __pythonite_signature__: ClassVar[str] = "Children"
 
-    content: list[PythoniteRepresentation] = []
-
-    def render(self, scope: Scope, *args, **kwargs) -> str:
+    def render(
+        self, scope: Scope, children: list[PythoniteRepresentation], *args, **kwargs
+    ) -> str:
         """
         Render the children represented by this class.
 
@@ -30,9 +30,15 @@ class TemplateChildren(PythoniteRepresentation):
             str: The rendered children.
         """
         result = ""
-        for child in self.content:
+        for child in children:
             result += str(child.execute(scope=scope, *args, **kwargs))
         return result
 
-    def execute(self, scope: Scope, *args, **kwargs) -> str:
-        return self.render(scope=scope, *args, **kwargs)
+    def execute(
+        self,
+        scope: Scope,
+        children: list[PythoniteRepresentation] = [],
+        *args,
+        **kwargs
+    ) -> str:
+        return self.render(scope=scope, children=children, *args, **kwargs)

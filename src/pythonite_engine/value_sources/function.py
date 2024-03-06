@@ -1,5 +1,6 @@
 from typing import ClassVar, Any, TYPE_CHECKING
 
+from ..pythonite_representation import PythoniteRepresentation
 from ..scope import Scope
 
 from .base import ValueSource
@@ -41,4 +42,9 @@ class FunctionSource(ValueSource):
         >>> function_source.execute()
         10
         """
+        for key, value in self.args.items():
+            if isinstance(value, PythoniteRepresentation):
+                self.args[key] = value.execute(
+                    scope=scope, engine=engine, *args, **kwargs
+                )
         return engine.get_function(function_id=self.function_id)(**self.args)

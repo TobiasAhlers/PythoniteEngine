@@ -23,3 +23,11 @@ def test_execute():
         FunctionSource(function_id="my_function_not_found", args={}).execute(
             scope=Scope(), engine=engine
         )
+
+    assert (
+        FunctionSource(
+            function_id="my_function",
+            args={"arg1": StaticValue(value=5, type=IntegerTypeRepresentation())},
+        ).execute(scope=Scope(), engine=engine)
+        == 10
+    )

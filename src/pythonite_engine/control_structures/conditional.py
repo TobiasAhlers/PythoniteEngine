@@ -33,11 +33,26 @@ class ConditionalStatement(ControlStructureRepresentation):
         if self.condition.execute(scope=scope, *args, **kwargs):
             if isinstance(self.consequent, PythoniteRepresentation):
                 return self.consequent.execute(scope=scope, *args, **kwargs)
-            else:
-                return self.consequent
+            elif isinstance(self.consequent, list):
+                html = ""
+                for item in self.consequent:
+                    if isinstance(item, PythoniteRepresentation):
+                        html += str(item.execute(scope=scope, *args, **kwargs))
+                    else:
+                        html += str(item)
+                return html                
+            return self.consequent
         else:
             if self.alternate is not None:
                 if isinstance(self.alternate, PythoniteRepresentation):
                     return self.alternate.execute(scope=scope, *args, **kwargs)
-                else:
-                    return self.alternate
+                elif isinstance(self.alternate, list):
+                    html = ""
+                    for item in self.alternate:
+                        if isinstance(item, PythoniteRepresentation):
+                            html += str(item.execute(scope=scope, *args, **kwargs))
+                        else:
+                            html += str(item)
+                    return html
+                return self.alternate
+                    

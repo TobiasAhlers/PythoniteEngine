@@ -1,11 +1,12 @@
-from typing import Self
+from typing import Optional, Self
+from pydantic import BaseModel, model_validator
 
 from .scope import Scope
 from .pythonite_engine import PythoniteEngine
 from .pythonite_representation import PythoniteRepresentation
 
 
-class PythoniteTemplate:
+class PythoniteTemplate(BaseModel):
     """
     Represents a Pythonite script.
 
@@ -17,45 +18,18 @@ class PythoniteTemplate:
         global_scope (Scope): The global scope used for the script.
     """
 
-    def __init__(
+    template_id: str
+    extends: Optional[str] = None
+    content: list[PythoniteRepresentation] = []
+
+    def render(
         self,
-        script: list[PythoniteRepresentation],
-        engine: PythoniteEngine,
         global_scope: Scope,
+        engine: PythoniteEngine,
+        children: list[PythoniteRepresentation] = [],
         *args,
         **kwargs
-    ) -> None:
-        self.script = script
-        self.engine = engine
-        self.global_scope = global_scope
-
-    @classmethod
-    def from_json(
-        cls, script: str, engine: PythoniteEngine, global_scope: Scope
-    ) -> Self:
-        """
-        Create a PythoniteTemplate from a JSON string.
-
-        Args:
-            script (str): The JSON string representing the script.
-            engine (PythoniteEngine): The engine used to execute the script.
-            global_scope (Scope): The global scope used for the script.
-
-        Returns:
-            PythoniteTemplate: The PythoniteTemplate created from the JSON string.
-        """
-        raise NotImplementedError()
-
-    def to_json(self) -> str:
-        """
-        Convert the PythoniteTemplate to a JSON string.
-
-        Returns:
-            str: The JSON string representing the PythoniteTemplate.
-        """
-        raise NotImplementedError()
-
-    def render(self, *args, **kwargs) -> str:
+    ) -> str:
         """
         Render the PythoniteTemplate.
 
@@ -66,4 +40,22 @@ class PythoniteTemplate:
         Returns:
             str: The rendered PythoniteTemplate.
         """
-        raise NotImplementedError()
+        if self.extends:
+            parent = engine.get_template(template_id=self.extends)
+            return parent.render(
+                global_scope=global_scope,
+                engine=engine,
+                children=self.content + children,
+                *args,
+                **kwargs
+            )
+
+        scope = Scope(parent=global_scope)
+        html = ""
+        for representation in self.content:
+            html += str(
+                representation.execute(
+                    scope=scope, engine=engine, children=children, *args, **kwargs
+                )
+            )
+        return html
