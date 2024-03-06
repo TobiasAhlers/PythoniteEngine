@@ -2,8 +2,8 @@ from typing import ClassVar, Iterable, Any
 
 from ..scope import Scope
 from ..pythonite_representation import PythoniteRepresentation
-from ..types.base import TypeRepresentation
 from ..annotation import Annotation
+from ..utils import execute_representations
 
 from .base import ControlStructureRepresentation
 
@@ -32,22 +32,17 @@ class ForLoop(ControlStructureRepresentation):
         Args:
             scope (Scope): The scope to use for the execution.
         """
-        if isinstance(self.iterable, PythoniteRepresentation):
-            self.iterable = self.iterable.execute(scope=scope, *args, **kwargs)
-
-        if isinstance(self.loop_variable_name, PythoniteRepresentation):
-            self.loop_variable_name = self.loop_variable_name.execute(scope=scope, *args, **kwargs)
-
-        print(self.iterable)
+        iterable = execute_representations(self.iterable, scope=scope, *args, **kwargs)
+        loop_variable_name = execute_representations(self.loop_variable_name, scope=scope, *args, **kwargs)
 
         loop_scope = Scope(parent=scope)
-        loop_scope.declare_variable(variable_name=self.loop_variable_name, type=self.loop_variable_annotation.type)
-
+        loop_scope.declare_variable(variable_name=loop_variable_name, type=self.loop_variable_annotation.type)
+        
         result = ""
-        for item in self.iterable:
+        for item in iterable:
             if isinstance(item, PythoniteRepresentation):
                 item = item.execute(scope=scope, *args, **kwargs)
-            loop_scope.set_variable_value(variable_name=self.loop_variable_name, value=item)
+            loop_scope.set_variable_value(variable_name=loop_variable_name, value=item)
 
             for element in self.body:
                 result += str(element.execute(scope=loop_scope, *args, **kwargs))

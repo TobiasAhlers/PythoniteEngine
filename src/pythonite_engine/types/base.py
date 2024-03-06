@@ -2,6 +2,7 @@ from typing import Any, ClassVar
 
 from ..pythonite_representation import PythoniteRepresentation
 from ..scope import Scope
+from ..utils import execute_representations
 
 
 class TypeRepresentation(PythoniteRepresentation):
@@ -96,4 +97,6 @@ class TypeRepresentation(PythoniteRepresentation):
         ...
         >>> MyTypeRepresentation().execute()
         """
+        value = execute_representations(value, scope=scope, *args, **kwargs)
+
         return self.convert_value(value)

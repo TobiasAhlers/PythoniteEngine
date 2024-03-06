@@ -1,6 +1,7 @@
 from typing import ClassVar, TYPE_CHECKING
 
 from ..pythonite_representation import PythoniteRepresentation
+from ..utils import execute_representations
 from ..scope import Scope
 
 if TYPE_CHECKING:
@@ -18,7 +19,7 @@ class RenderTemplate(PythoniteRepresentation):
 
     __pythonite_signature__: ClassVar[str] = "RenderTemplate"
 
-    template_id: str
+    template_id: str | PythoniteRepresentation
 
     def render(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> str:
         """
@@ -30,7 +31,10 @@ class RenderTemplate(PythoniteRepresentation):
         Returns:
             str: The rendered template.
         """
-        return engine.get_template(template_id=self.template_id).render(
+        template_id = execute_representations(
+            self.template_id, scope=scope, *args, **kwargs
+        )
+        return engine.get_template(template_id=template_id).render(
             global_scope=scope, engine=engine, *args, **kwargs
         )
 

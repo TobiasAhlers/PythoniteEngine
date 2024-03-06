@@ -1,7 +1,7 @@
 from typing import Any, ClassVar, Literal
 from pydantic import Field
 
-from ..pythonite_representation import PythoniteRepresentation
+from ..utils import execute_representations
 
 from .base import OperatorRepresentation
 
@@ -27,26 +27,25 @@ class ArithmeticOperatorRepresentation(OperatorRepresentation):
         Returns:
             Any: The result of executing the operator represented by this class.
         """
-        for i, operand in enumerate(self.operands):
-            if isinstance(operand, PythoniteRepresentation):
-                self.operands[i] = operand.execute(*args, **kwargs)
+        operator = execute_representations(self.operator, *args, **kwargs)
+        operands = execute_representations(self.operands, *args, **kwargs)
 
-        match self.operator:
+        match operator:
             case "+":
-                return self.operands[0] + self.operands[1]
+                return operands[0] + operands[1]
             case "-":
-                return self.operands[0] - self.operands[1]
+                return operands[0] - operands[1]
             case "*":
-                return self.operands[0] * self.operands[1]
+                return operands[0] * operands[1]
             case "/":
-                return self.operands[0] / self.operands[1]
+                return operands[0] / operands[1]
             case "//":
-                return self.operands[0] // self.operands[1]
+                return operands[0] // operands[1]
             case "%":
-                return self.operands[0] % self.operands[1]
+                return operands[0] % operands[1]
             case "**":
-                return self.operands[0] ** self.operands[1]
+                return operands[0] ** operands[1]
             case _:
                 raise NotImplementedError(
-                    f"Expected the operator to be one of '+', '-', '*', '/', '//', '%', '**', but got {self.operator}. This should not happen. Please report this as a bug."
+                    f"Expected the operator to be one of '+', '-', '*', '/', '//', '%', '**', but got {operator}. This should not happen. Please report this as a bug."
                 )

@@ -1,7 +1,8 @@
-from typing import Callable, TYPE_CHECKING
+from typing import Callable, TYPE_CHECKING, Any
 
 from .pythonite_representation import PythoniteRepresentation
 from .scope import Scope
+from .annotation import Annotation
 
 from .variable import *
 from .types import *
@@ -32,7 +33,40 @@ class PythoniteEngine:
     """
 
     def __init__(self) -> None:
-        self.representations: dict[str, PythoniteRepresentation] = {}
+        self.representations: dict[str, PythoniteRepresentation] = {
+            HtmlTag.__pythonite_signature__: HtmlTag,
+            RenderComponent.__pythonite_signature__: RenderComponent,
+            ConditionalStatement.__pythonite_signature__: ConditionalStatement,
+            ForLoop.__pythonite_signature__: ForLoop,
+            ArithmeticOperatorRepresentation.__pythonite_signature__: ArithmeticOperatorRepresentation,
+            ComparisonOperatorRepresentation.__pythonite_signature__: ComparisonOperatorRepresentation,
+            IdentityOperatorRepresentation.__pythonite_signature__: IdentityOperatorRepresentation,
+            IndexAccessOperatorRepresentation.__pythonite_signature__: IndexAccessOperatorRepresentation,
+            LogicalOperatorRepresentation.__pythonite_signature__: LogicalOperatorRepresentation,
+            MembershipOperatorRepresentation.__pythonite_signature__: MembershipOperatorRepresentation,
+            SlicingOperatorRepresentation.__pythonite_signature__: SlicingOperatorRepresentation,
+            TemplateChildren.__pythonite_signature__: TemplateChildren,
+            RenderTemplate.__pythonite_signature__: RenderTemplate,
+            AnyTypeRepresentation.__pythonite_signature__: AnyTypeRepresentation,
+            BooleanTypeRepresentation.__pythonite_signature__: BooleanTypeRepresentation,
+            DateTypeRepresentation.__pythonite_signature__: DateTypeRepresentation,
+            DateTimeTypeRepresentation.__pythonite_signature__: DateTimeTypeRepresentation,
+            DictionaryTypeRepresentation.__pythonite_signature__: DictionaryTypeRepresentation,
+            FloatTypeRepresentation.__pythonite_signature__: FloatTypeRepresentation,
+            IntegerTypeRepresentation.__pythonite_signature__: IntegerTypeRepresentation,
+            ListTypeRepresentation.__pythonite_signature__: ListTypeRepresentation,
+            NoneTypeRepresentation.__pythonite_signature__: NoneTypeRepresentation,
+            ObjectTypeRepresentation.__pythonite_signature__: ObjectTypeRepresentation,
+            StringTypeRepresentation.__pythonite_signature__: StringTypeRepresentation,
+            UnionTypeRepresentation.__pythonite_signature__: UnionTypeRepresentation,
+            FunctionSource.__pythonite_signature__: FunctionSource,
+            StaticValue.__pythonite_signature__: StaticValue,
+            VariableAssignment.__pythonite_signature__: VariableAssignment,
+            VariableDeclaration.__pythonite_signature__: VariableDeclaration,
+            VariableInitialization.__pythonite_signature__: VariableInitialization,
+            VariableRetrieval.__pythonite_signature__: VariableRetrieval,
+            Annotation.__pythonite_signature__: Annotation,
+        }
         self.functions: dict[str, Callable] = {}
         self.global_scope = Scope()
         self.components: dict[str,] = {}
@@ -195,3 +229,39 @@ class PythoniteEngine:
             raise ComponentNotFoundError(
                 f"Component with id {component_id} not found in Pythonite engine."
             )
+
+    def parse_obj(self, obj: Any) -> Any:
+        """
+        Parse an object to a Pythonite representation.
+
+        Args:
+            obj (Any): The object to parse.
+
+        Returns:
+            Any: The parsed object.
+
+        Example:
+        >>> from pythonite_engine import PythoniteEngine
+        >>> engine = PythoniteEngine()
+        >>> engine.parse_obj({"__pythonite_signature__": "StaticValue", "value": "Hello, ", "type": {"__pythonite_signature__": "StringTypeRepresentation"}})
+        StaticValue(value='Hello, ', type=StringTypeRepresentation())
+
+        >>> engine.parse_obj([{"__pythonite_signature__": "StaticValue", "value": "Hello, ", "type": {"__pythonite_signature__": "StringTypeRepresentation"}}])
+        [StaticValue(value='Hello, ', type=StringTypeRepresentation())]
+
+        >>> engine.parse_obj(123)
+        123
+        """
+        if isinstance(obj, dict):
+            if "__pythonite_signature__" in obj:
+                representation = self.get_representation(obj["__pythonite_signature__"])
+                for key, value in obj.items():
+                    if key != "__pythonite_signature__":
+                        obj[key] = self.parse_obj(value)
+                return representation.model_validate(obj=obj)
+            else:
+                return {key: self.parse_obj(value) for key, value in obj.items()}
+        elif isinstance(obj, list):
+            return [self.parse_obj(item) for item in obj]
+        else:
+            return obj

@@ -1,5 +1,6 @@
 from typing import Optional, Any, ClassVar
 
+from .utils import execute_representations
 from .scope import Scope
 from .pythonite_representation import PythoniteRepresentation
 from .types.base import TypeRepresentation
@@ -35,13 +36,16 @@ class Annotation(PythoniteRepresentation):
         Raises:
             ConversionError: If the value cannot be converted to the type of the annotation.
         """
+        default = execute_representations(self.default, *args, **kwargs)
+        required = execute_representations(self.required, *args, **kwargs)
+
         if value is None:
-            if self.required:
+            if required:
                 raise ConversionError(
                     f"Annotation {self.type} is required and cannot be None."
                 )
-            if self.default is not None:
-                return self.type.convert_value(self.default)
+            if default is not None:
+                return self.type.convert_value(default)
             return None
 
         return self.type.convert_value(value)
@@ -53,4 +57,4 @@ class Annotation(PythoniteRepresentation):
         Returns:
             Any: The value of the annotation represented by this class.
         """
-        return self.validate_annotation(value=value, *args, **kwargs)
+        return self.validate_annotation(value=value, scope=scope, *args, **kwargs)

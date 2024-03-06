@@ -1,7 +1,7 @@
 from typing import Any, ClassVar, Literal
 from pydantic import Field
 
-from ..pythonite_representation import PythoniteRepresentation
+from ..utils import execute_representations
 
 from .base import OperatorRepresentation
 
@@ -27,9 +27,9 @@ class MembershipOperatorRepresentation(OperatorRepresentation):
         Returns:
             Any: The result of executing the operator represented by this class.
         """
-        for i, operand in enumerate(self.operands):
-            if isinstance(operand, PythoniteRepresentation):
-                self.operands[i] = operand.execute(*args, **kwargs)
+        self.operator = execute_representations(self.operator, *args, **kwargs)
+        self.operands = execute_representations(self.operands, *args, **kwargs)
+        
         match self.operator:
             case "in":
                 return self.operands[0] in self.operands[1]

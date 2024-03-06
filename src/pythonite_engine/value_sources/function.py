@@ -2,6 +2,7 @@ from typing import ClassVar, Any, TYPE_CHECKING
 
 from ..pythonite_representation import PythoniteRepresentation
 from ..scope import Scope
+from ..utils import execute_representations
 
 from .base import ValueSource
 
@@ -26,8 +27,8 @@ class FunctionSource(ValueSource):
 
     __pythonite_signature__: ClassVar[str] = "FunctionSource"
 
-    function_id: str
-    args: dict[str, Any] = {}
+    function_id: str | PythoniteRepresentation
+    args: dict[str, Any | PythoniteRepresentation] = {}
 
     def execute(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> Any:
         """
@@ -42,9 +43,11 @@ class FunctionSource(ValueSource):
         >>> function_source.execute()
         10
         """
-        for key, value in self.args.items():
-            if isinstance(value, PythoniteRepresentation):
-                self.args[key] = value.execute(
-                    scope=scope, engine=engine, *args, **kwargs
-                )
-        return engine.get_function(function_id=self.function_id)(**self.args)
+        function_id = execute_representations(
+            self.function_id, scope=scope, engine=engine, *args, **kwargs
+        )
+        passed_args = execute_representations(
+            self.args, scope=scope, engine=engine, *args, **kwargs
+        )
+
+        return engine.get_function(function_id=function_id)(**passed_args)

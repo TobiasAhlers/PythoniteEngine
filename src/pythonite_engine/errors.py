@@ -92,3 +92,9 @@ class ComponentNotFoundError(PythoniteEngineError):
     """
     Raised when a component is not found.
     """
+
+
+class OperatorError(PythoniteEngineError):
+    """
+    The base class for all operator related exceptions.
+    """

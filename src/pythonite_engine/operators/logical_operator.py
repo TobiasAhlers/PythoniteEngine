@@ -1,7 +1,7 @@
 from typing import Any, ClassVar, Literal
 from pydantic import Field
 
-from ..pythonite_representation import PythoniteRepresentation
+from ..utils import execute_representations
 
 from .base import OperatorRepresentation
 
@@ -27,15 +27,15 @@ class LogicalOperatorRepresentation(OperatorRepresentation):
         Returns:
             Any: The result of executing the operator represented by this class.
         """
-        for i, operand in enumerate(self.operands):
-            if isinstance(operand, PythoniteRepresentation):
-                self.operands[i] = operand.execute(*args, **kwargs)
-        match self.operator:
+        operator = execute_representations(self.operator, *args, **kwargs)
+        operands = execute_representations(self.operands, *args, **kwargs)
+        
+        match operator:
             case "and":
-                return all(self.operands)
+                return all(operands)
             case "or":
-                return any(self.operands)
+                return any(operands)
             case _:
                 raise NotImplementedError(
-                    f"Expected the operator to be one of 'and', 'or', but got {self.operator}. This should not happen. Please report this as a bug."
+                    f"Expected the operator to be one of 'and', 'or', but got {operator}. This should not happen. Please report this as a bug."
                 )

@@ -1,5 +1,6 @@
 from typing import Optional, Self
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel
+from json import loads, dumps
 
 from .scope import Scope
 from .pythonite_engine import PythoniteEngine
@@ -22,6 +23,35 @@ class PythoniteTemplate(BaseModel):
     extends: Optional[str] = None
     content: list[PythoniteRepresentation] = []
 
+    @classmethod
+    def model_validate_json(cls, json_data: str, engine: PythoniteEngine) -> Self:
+        """
+        Validate the JSON data and return a PythoniteTemplate instance.
+
+        Args:
+            json_data (str): The JSON data to validate.
+
+        Returns:
+            PythoniteTemplate: The PythoniteTemplate instance.
+        """
+        data = loads(json_data)
+        return cls.model_validate(obj=engine.parse_obj(data))
+    
+    def model_dump_json(self) -> str:
+        """
+        Dump the PythoniteTemplate instance to JSON.
+
+        Returns:
+            str: The JSON representation of the PythoniteTemplate instance.
+        """
+        return dumps(
+            {
+                "template_id": self.template_id,
+                "extends": self.extends,
+                "content": [representation.model_dump() for representation in self.content],
+            }
+        )
+    
     def render(
         self,
         global_scope: Scope,

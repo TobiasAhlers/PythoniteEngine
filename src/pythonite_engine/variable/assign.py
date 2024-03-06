@@ -1,6 +1,7 @@
-from typing import Any, ClassVar, Literal
+from typing import Any, ClassVar
 
 from ..scope import Scope
+from ..utils import execute_representations
 
 from .base import VariableRepresentation
 
@@ -36,4 +37,7 @@ class VariableAssignment(VariableRepresentation):
         >>> variable = VariableAssignment(variable_name, value)
         >>> variable.execute()
         """
-        scope.set_variable_value(self.variable_name, self.value)
+        variable_name = execute_representations(self.variable_name, scope=scope, *args, **kwargs)
+        value = execute_representations(self.value, scope=scope, *args, **kwargs)
+
+        scope.set_variable_value(variable_name, value)

@@ -2,6 +2,7 @@ from typing import ClassVar
 
 from ..pythonite_representation import PythoniteRepresentation
 from ..scope import Scope
+from ..utils import execute_representations
 
 
 class HtmlTag(PythoniteRepresentation):
@@ -22,46 +23,52 @@ class HtmlTag(PythoniteRepresentation):
     styles: dict[str, str] = {}
     content: list[PythoniteRepresentation] = []
 
-    def render_classes(self) -> str:
+    def render_classes(self, *args, **kwargs) -> str:
         """
         Render the classes of the tag represented by this class.
 
         Returns:
             str: The rendered classes.
         """
-        classes = " ".join(self.classes)
-        return f' class="{classes}"' if classes else ""
-    
-    def render_styles(self) -> str:
+        classes = execute_representations(self.classes, *args, **kwargs)
+        html = " ".join(classes)
+        return f' class="{html}"' if html else ""
+
+    def render_styles(self, *args, **kwargs) -> str:
         """
         Render the styles of the tag represented by this class.
 
         Returns:
             str: The rendered styles.
         """
-        styles = ";".join(
-            [f"{style_name}: {style_value}" for style_name, style_value in self.styles.items()]
+        styles = execute_representations(self.styles, *args, **kwargs)
+        html = ";".join(
+            [
+                f"{style_name}: {style_value}"
+                for style_name, style_value in styles.items()
+            ]
         )
-        return f' style="{styles}"' if styles else ""
+        return f' style="{html}"' if html else ""
 
-    def render_attributes(self) -> str:
+    def render_attributes(self, *args, **kwargs) -> str:
         """
         Render the attributes of the tag represented by this class.
 
         Returns:
             str: The rendered attributes.
         """
-        attributes = " ".join(
+        attributes = execute_representations(self.attributes, *args, **kwargs)
+        html = " ".join(
             [
                 (
                     f'{attribute_name}="{attribute_value}"'
                     if isinstance(attribute_value, str)
                     else f"{attribute_name}"
                 )
-                for attribute_name, attribute_value in self.attributes.items()
+                for attribute_name, attribute_value in attributes.items()
             ]
         )
-        return f" {attributes}" if attributes else ""
+        return f" {html}" if html else ""
 
     def render_content(self, scope: Scope, *args, **kwargs) -> str:
         """
@@ -84,7 +91,7 @@ class HtmlTag(PythoniteRepresentation):
         Returns:
             str: The rendered HTML tag.
         """
-        return f"<{self.tag_name}{self.render_classes()}{self.render_styles()}{self.render_attributes()}>{self.render_content(scope, *args, **kwargs)}</{self.tag_name}>"
+        return f"<{self.tag_name}{self.render_classes(scope=scope, *args, **kwargs)}{self.render_styles(scope=scope, *args, **kwargs)}{self.render_attributes(scope=scope, *args, **kwargs)}>{self.render_content(scope, *args, **kwargs)}</{self.tag_name}>"
 
     def execute(self, scope: Scope, *args, **kwargs) -> str:
         """

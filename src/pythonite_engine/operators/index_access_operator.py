@@ -1,5 +1,7 @@
 from typing import Any, ClassVar
 
+from ..utils import execute_representations
+from ..errors import OperatorError
 from ..pythonite_representation import PythoniteRepresentation
 
 from .base import OperatorRepresentation
@@ -12,8 +14,8 @@ class IndexAccessOperatorRepresentation(OperatorRepresentation):
 
     __pythonite_signature__: ClassVar[str] = "IndexAccessOperator"
 
-    index: str | int
-    operands: dict | list
+    index: str | int | PythoniteRepresentation
+    operands: dict | list | PythoniteRepresentation
 
     def execute(self, *args, **kwargs) -> Any:
         """
@@ -22,13 +24,12 @@ class IndexAccessOperatorRepresentation(OperatorRepresentation):
         Returns:
             Any: The result of executing the operator represented by this class.
         """
-        operands = self.operands
-        if isinstance(operands, list):
-            for i, operand in enumerate(operands):
-                if isinstance(operand, PythoniteRepresentation):
-                    operands[i] = operand.execute(*args, **kwargs)
-        elif isinstance(operands, dict):
-            for key, operand in operands.items():
-                if isinstance(operand, PythoniteRepresentation):
-                    operands[key] = operand.execute(*args, **kwargs)
-        return self.operands[self.index]
+        operands = execute_representations(self.operands, *args, **kwargs)
+        index = execute_representations(self.index, *args, **kwargs)
+
+        try:
+            return operands[index]
+        except (KeyError, IndexError, TypeError):
+            raise OperatorError(
+                f"Index access operator {index} is not valid for {operands}."
+            )

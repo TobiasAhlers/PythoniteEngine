@@ -2,6 +2,7 @@ from typing import Literal, ClassVar
 
 from ..types.base import TypeRepresentation
 from ..scope import Scope
+from ..utils import execute_representations
 
 from .base import VariableRepresentation
 
@@ -40,6 +41,9 @@ class VariableDeclaration(VariableRepresentation):
         >>> variable = VariableDeclaration(variable_name, type, scope)
         >>> variable.execute()
         """
+        variable_name = execute_representations(self.variable_name, scope=scope, *args, **kwargs)
+        variable_scope = execute_representations(self.scope, scope=scope, *args, **kwargs)
+
         scope.declare_variable(
-            variable_name=self.variable_name, type=self.type, scope=self.scope
+            variable_name=variable_name, type=self.type, scope=variable_scope
         )

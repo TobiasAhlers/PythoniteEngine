@@ -1,5 +1,6 @@
 from typing import Any, ClassVar, Optional
 
+from ..utils import execute_representations
 from ..pythonite_representation import PythoniteRepresentation
 
 from .base import OperatorRepresentation
@@ -12,9 +13,9 @@ class SlicingOperatorRepresentation(OperatorRepresentation):
 
     __pythonite_signature__: ClassVar[str] = "SlicingOperator"
 
-    start: Optional[int] = None
-    stop: Optional[int] = None
-    step: Optional[int] = None
+    start: Optional[int | PythoniteRepresentation] = None
+    stop: Optional[int | PythoniteRepresentation] = None
+    step: Optional[int | PythoniteRepresentation] = None
 
     operands: list
 
@@ -25,8 +26,9 @@ class SlicingOperatorRepresentation(OperatorRepresentation):
         Returns:
             Any: The result of executing the operator represented by this class.
         """
-        operands = self.operands
-        for i, operand in enumerate(operands):
-            if isinstance(operand, PythoniteRepresentation):
-                operands[i] = operand.execute(*args, **kwargs)
-        return operands[slice(self.start, self.stop, self.step)]
+        self.operands = execute_representations(self.operands, *args, **kwargs)
+        self.start = execute_representations(self.start, *args, **kwargs)
+        self.stop = execute_representations(self.stop, *args, **kwargs)
+        self.step = execute_representations(self.step, *args, **kwargs)
+
+        return self.operands[slice(self.start, self.stop, self.step)]

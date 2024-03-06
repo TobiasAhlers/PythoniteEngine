@@ -1,6 +1,7 @@
 from typing import Any, ClassVar
 
 from ..scope import Scope
+from ..utils import execute_representations
 
 from .base import VariableRepresentation
 
@@ -35,4 +36,6 @@ class VariableRetrieval(VariableRepresentation):
         >>> variable.execute()
         5
         """
-        return scope.get_variable_value(self.variable_name)
+        variable_name = execute_representations(self.variable_name, scope=scope, *args, **kwargs)
+
+        return scope.get_variable_value(variable_name)

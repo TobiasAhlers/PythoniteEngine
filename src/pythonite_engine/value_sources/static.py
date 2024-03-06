@@ -2,6 +2,7 @@ from typing import ClassVar, Any
 
 from ..types.base import TypeRepresentation
 from ..scope import Scope
+from ..utils import execute_representations
 
 from .base import ValueSource
 
@@ -39,4 +40,6 @@ class StaticValue(ValueSource):
         >>> static_value.execute()
         5
         """
-        return self.type.convert_value(value=self.value)
+        value = execute_representations(self.value, scope=scope, *args, **kwargs)
+
+        return self.type.convert_value(value=value)

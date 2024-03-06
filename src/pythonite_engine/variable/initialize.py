@@ -1,6 +1,7 @@
 from typing import Literal, Any, ClassVar
 
 from ..types.base import TypeRepresentation
+from ..utils import execute_representations
 from ..scope import Scope
 
 from .base import VariableRepresentation
@@ -39,7 +40,11 @@ class VariableInitialization(VariableRepresentation):
         >>> variable = VariableInitialization(variable_name, type, value, scope)
         >>> variable.execute()
         """
+        variable_name = execute_representations(self.variable_name, scope=scope, *args, **kwargs)
+        variable_scope = execute_representations(self.scope, scope=scope, *args, **kwargs)
+        value = execute_representations(self.value, scope=scope, *args, **kwargs)
+
         scope.declare_variable(
-            variable_name=self.variable_name, type=self.type, scope=self.scope
+            variable_name=variable_name, type=self.type, scope=variable_scope
         )
-        scope.set_variable_value(variable_name=self.variable_name, value=self.value)
+        scope.set_variable_value(variable_name=variable_name, value=value)
