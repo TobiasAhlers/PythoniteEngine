@@ -1,4 +1,4 @@
-from typing import Callable, Any
+from typing import Callable, TYPE_CHECKING
 
 from .pythonite_representation import PythoniteRepresentation
 from .scope import Scope
@@ -12,6 +12,9 @@ from .control_structures import *
 from .component import *
 
 from .errors import *
+
+if TYPE_CHECKING:
+    from .pythonite_template import PythoniteTemplate
 
 
 class PythoniteEngine:
@@ -32,7 +35,8 @@ class PythoniteEngine:
         self.representations: dict[str, PythoniteRepresentation] = {}
         self.functions: dict[str, Callable] = {}
         self.global_scope = Scope()
-        self.components: dict[str, ] = {}
+        self.components: dict[str,] = {}
+        self.templates: dict[str, "PythoniteTemplate"] = {}
 
     def register_function(self, function_id: str, function: Callable) -> None:
         """
@@ -118,16 +122,76 @@ class PythoniteEngine:
                 f"Representation with id {pythonite_id} not found in Pythonite engine."
             )
 
-    def convert_to_pythonite_representation(
-        self, obj: Any
-    ) -> Any | PythoniteRepresentation:
+    def register_template(self, template: "PythoniteTemplate") -> None:
         """
-        Convert an object to a Pythonite representation if it represents a PythoniteRepresentation.
+        Register a template with the Pythonite engine. This makes it retrievable from a PythoniteTemplate.
 
         Args:
-            obj (Any): The object to convert.
+            template (PythoniteTemplate): The template to register.
+        """
+        self.templates[template.template_id] = template
+
+    def get_template(self, template_id: str) -> "PythoniteTemplate":
+        """
+        Get a template from the Pythonite engine.
+
+        Args:
+            template_id (str): The id of the template to get.
 
         Returns:
-            Any: The converted object.
+            PythoniteTemplate: The template with the given id.
+
+        Example:
+        >>> from pythonite_engine import PythoniteEngine
+        >>> from pythonite_engine import PythoniteTemplate
+        >>> class MyTemplate(PythoniteTemplate):
+        ...     template_id = "my_template"
+        ...
+        >>> engine = PythoniteEngine()
+        >>> engine.register_template(MyTemplate)
+        >>> engine.get_template("my_template")
+        <class '__main__.MyTemplate'>
         """
-        raise NotImplementedError()
+        try:
+            return self.templates[template_id]
+        except KeyError:
+            raise TemplateNotFoundError(
+                f"Template with id {template_id} not found in Pythonite engine."
+            )
+
+    def register_component(self, component: Component) -> None:
+        """
+        Register a component with the Pythonite engine. This makes it retrievable from a PythoniteTemplate.
+
+        Args:
+            component (Component): The component to register.
+        """
+        self.components[component.component_id] = component
+
+    def get_component(self, component_id: str) -> Component:
+        """
+        Get a component from the Pythonite engine.
+
+        Args:
+            component_id (str): The id of the component to get.
+
+        Returns:
+            Component: The component with the given id.
+
+        Example:
+        >>> from pythonite_engine import PythoniteEngine
+        >>> from pythonite_engine import Component
+        >>> class MyComponent(Component):
+        ...     component_id = "my_component"
+        ...
+        >>> engine = PythoniteEngine()
+        >>> engine.register_component(MyComponent)
+        >>> engine.get_component("my_component")
+        <class '__main__.MyComponent'>
+        """
+        try:
+            return self.components[component_id]
+        except KeyError:
+            raise ComponentNotFoundError(
+                f"Component with id {component_id} not found in Pythonite engine."
+            )

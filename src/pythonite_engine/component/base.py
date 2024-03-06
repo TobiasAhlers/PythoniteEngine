@@ -1,7 +1,6 @@
 from pydantic import BaseModel
-from typing import Self
+from jinja2 import Template
 
-from ..pythonite_representation import PythoniteRepresentation
 from ..annotation import Annotation
 
 
@@ -15,25 +14,12 @@ class Component(BaseModel):
     Attributes:
         component_id (str): The id of the component.
         annotation (dict[str, Annotation]): The annotations of the component.
-        content (list[PythoniteRepresentation]): The content of the component.
+        jinja2_template (str): The template of the component.
     """
 
     component_id: str
     annotation: dict[str, Annotation] = {}
-    content: list[PythoniteRepresentation]
-
-    @classmethod
-    def from_jinja2(cls: Self, jinja2: str, *args, **kwargs) -> Self:
-        """
-        Create a new instance of this class from a Jinja2 template.
-
-        Args:
-            jinja2 (str): The Jinja2 template to use for the creation.
-
-        Returns:
-            Self: The new instance of this class.
-        """
-        raise NotImplementedError()
+    jinja2_template: str
 
     def render(self, **args) -> str:
         """
@@ -45,4 +31,7 @@ class Component(BaseModel):
         Returns:
             str: The rendered component.
         """
-        raise NotImplementedError()
+        context = {}
+        for arg, annotation in self.annotation.items():
+            context[arg] = annotation.validate_annotation(value=args.get(arg, None))
+        return Template(source=self.jinja2_template).render(**context)

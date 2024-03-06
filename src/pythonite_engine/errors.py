@@ -80,3 +80,15 @@ class RepresentationNotFoundError(PythoniteEngineError):
     """
     Raised when a representation is not found.
     """
+
+
+class TemplateNotFoundError(PythoniteEngineError):
+    """
+    Raised when a template is not found.
+    """
+
+
+class ComponentNotFoundError(PythoniteEngineError):
+    """
+    Raised when a component is not found.
+    """

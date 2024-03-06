@@ -1,7 +1,10 @@
-from typing import ClassVar, Any
+from typing import ClassVar, Any, TYPE_CHECKING
 
 from ..scope import Scope
 from ..pythonite_representation import PythoniteRepresentation
+
+if TYPE_CHECKING:
+    from ..pythonite_engine import PythoniteEngine
 
 
 class RenderComponent(PythoniteRepresentation):
@@ -17,16 +20,18 @@ class RenderComponent(PythoniteRepresentation):
     component_id: str
     args: dict[str, Any] = {}
 
-    def render(self, scope: Scope, *args, **kwargs) -> str:
+    def render(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> str:
         """
         Render the component represented by this class.
 
         Returns:
             str: The rendered component.
         """
-        raise NotImplementedError()
+        return engine.get_component(component_id=self.component_id).render(
+            scope=scope, engine=engine, *args, **kwargs | self.args
+        )
 
-    def execute(self, scope: Scope, *args, **kwargs) -> str:
+    def execute(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> str:
         """
         Render the component represented by this class.
 
@@ -36,4 +41,4 @@ class RenderComponent(PythoniteRepresentation):
         Returns:
             str: The rendered component.
         """
-        return self.render(scope, *args, **kwargs)
+        return self.render(scope=scope, engine=engine, *args, **kwargs)
