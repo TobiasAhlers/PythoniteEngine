@@ -29,7 +29,7 @@ class DateTimeTypeRepresentation(TypeRepresentation):
         """
         try:
             return datetime.fromisoformat(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ConversionError(f"Could not convert {value} to datetime.")
 
     def get_type(self) -> type:

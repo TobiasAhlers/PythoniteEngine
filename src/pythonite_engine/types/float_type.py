@@ -28,7 +28,7 @@ class FloatTypeRepresentation(TypeRepresentation):
         """
         try:
             return float(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ConversionError(f"Could not convert {value} to float.")
 
     def get_type(self) -> type:

@@ -28,7 +28,7 @@ class IntegerTypeRepresentation(TypeRepresentation):
         """
         try:
             return int(value)
-        except ValueError:
+        except (ValueError, TypeError):
             raise ConversionError(f"Could not convert {value} to int.")
 
     def get_type(self) -> type:
