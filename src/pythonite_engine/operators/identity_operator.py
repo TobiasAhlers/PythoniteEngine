@@ -1,6 +1,8 @@
 from typing import Any, ClassVar, Literal
 from pydantic import Field
 
+from ..pythonite_representation import PythoniteRepresentation
+
 from .base import OperatorRepresentation
 
 
@@ -18,13 +20,16 @@ class IdentityOperatorRepresentation(OperatorRepresentation):
     operator: Literal["is", "is not"]
     operands: list[Any] = Field(..., min_length=2, max_length=2)
 
-    def execute(self) -> Any:
+    def execute(self, *args, **kwargs) -> Any:
         """
         Execute the operator represented by this class.
 
         Returns:
             Any: The result of executing the operator represented by this class.
         """
+        for i, operand in enumerate(self.operands):
+            if isinstance(operand, PythoniteRepresentation):
+                self.operands[i] = operand.execute(*args, **kwargs)
         match self.operator:
             case "is":
                 return self.operands[0] is self.operands[1]
