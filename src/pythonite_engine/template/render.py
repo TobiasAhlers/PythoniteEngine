@@ -1,9 +1,10 @@
-from typing import ClassVar
+from typing import ClassVar, TYPE_CHECKING
 
 from ..pythonite_representation import PythoniteRepresentation
 from ..scope import Scope
 
-from .block import TemplateBlock
+if TYPE_CHECKING:
+    from ..pythonite_engine import PythoniteEngine
 
 
 class RenderTemplate(PythoniteRepresentation):
@@ -18,9 +19,8 @@ class RenderTemplate(PythoniteRepresentation):
     __pythonite_signature__: ClassVar[str] = "RenderTemplate"
 
     template_id: str
-    content: list[TemplateBlock]
 
-    def render(self, scope: Scope, *args, **kwargs) -> str:
+    def render(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> str:
         """
         Render the template represented by this class.
 
@@ -30,9 +30,11 @@ class RenderTemplate(PythoniteRepresentation):
         Returns:
             str: The rendered template.
         """
-        raise NotImplementedError()
+        return engine.get_template(template_id=self.template_id).render(
+            global_scope=scope, engine=engine, *args, **kwargs
+        )
 
-    def execute(self, scope: Scope, *args, **kwargs) -> str:
+    def execute(self, scope: Scope, engine: "PythoniteEngine", *args, **kwargs) -> str:
         """
         Render the template represented by this class.
 
@@ -42,4 +44,4 @@ class RenderTemplate(PythoniteRepresentation):
         Returns:
             str: The rendered template.
         """
-        return self.render(scope, *args, **kwargs)
+        return self.render(scope=scope, engine=engine, *args, **kwargs)

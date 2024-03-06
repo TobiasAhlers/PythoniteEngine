@@ -1,4 +1,4 @@
-from .base import RenderTemplate
-from .block import TemplateBlock
+from .render import RenderTemplate
+from .children import TemplateChildren
 
-__all__ = ["RenderTemplate", "TemplateBlock"]
+__all__ = ["RenderTemplate", "TemplateChildren"]
