@@ -1,6 +1,7 @@
 from pydantic import BaseModel
-from jinja2 import Template
 
+from ..scope import Scope
+from ..pythonite_representation import PythoniteRepresentation
 from ..annotation import Annotation
 
 
@@ -19,9 +20,9 @@ class Component(BaseModel):
 
     component_id: str
     annotation: dict[str, Annotation] = {}
-    jinja2_template: str
+    content: list[PythoniteRepresentation] = []
 
-    def render(self, **args) -> str:
+    def render(self, scope: Scope, **args) -> str:
         """
         Render the component represented by this class.
 
@@ -31,7 +32,11 @@ class Component(BaseModel):
         Returns:
             str: The rendered component.
         """
-        context = {}
+        component_scope = Scope(parent=scope)
         for arg, annotation in self.annotation.items():
-            context[arg] = annotation.validate_annotation(value=args.get(arg, None))
-        return Template(source=self.jinja2_template).render(**context)
+            component_scope.declare_variable(variable_name=arg, type=annotation.type)
+            component_scope.set_variable_value(variable_name=arg, value=args.get(arg, None))
+        html = ""
+        for content in self.content:
+            html += str(content.execute(scope=component_scope))
+        return html

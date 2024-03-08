@@ -77,7 +77,11 @@ def test_render_json():
 
     component = Component(
         component_id="user_card",
-        jinja2_template="{{ user_id }}: {{ user_name }}",
+        content=[
+            VariableRetrieval(variable_name="user_id", type=IntegerTypeRepresentation()),
+            StaticValue(value=": ", type=StringTypeRepresentation()),
+            VariableRetrieval(variable_name="user_name", type=StringTypeRepresentation()),
+        ],
         annotation={
             "user_id": Annotation(type=IntegerTypeRepresentation()),
             "user_name": Annotation(type=StringTypeRepresentation()),

@@ -16,6 +16,5 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pydantic",
-    "jinja2"
+    "pydantic"
 ]
