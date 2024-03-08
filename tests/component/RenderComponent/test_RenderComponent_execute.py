@@ -7,7 +7,7 @@ def test_execute_existing():
     engine = PythoniteEngine()
     component = Component(
         component_id="my_component",
-        jinja2_template="Hello, world!",
+        content=[StaticValue(value="Hello, world!", type=StringTypeRepresentation())],
     )
     engine.register_component(component)
 
