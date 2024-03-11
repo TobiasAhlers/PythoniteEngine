@@ -3,6 +3,7 @@ from .scope import Scope
 from .annotation import Annotation
 from .pythonite_engine import PythoniteEngine
 from .pythonite_template import PythoniteTemplate
+from .engine_extension import EngineExtension
 
 from .types import *
 from .operators import *
